@@ -5,8 +5,17 @@ using UnityEngine;
 /// </summary>
 public class RotateOnClick : MonoBehaviour
 {
+    private LevelManager levelManager;
+
+    private void Start()
+    {
+        levelManager = FindFirstObjectByType<LevelManager>();
+    }
     void Update()
     {
+        if (levelManager.isGameover || levelManager.isPaused || levelManager.isDragging)
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -15,7 +24,7 @@ public class RotateOnClick : MonoBehaviour
                 if (hit.transform == transform)
                 {
                     transform.Rotate(0f, 90f, 0);
-                    LevelManager.Instance.SpreadEnergy();
+                    levelManager.SpreadEnergy();
                 }
             }
         }

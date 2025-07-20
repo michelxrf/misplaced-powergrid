@@ -8,10 +8,12 @@ using UnityEngine;
 public class ScoreHud : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI scoreText;
+    private LevelManager levelManager;
 
     private void Start()
     {
-        LevelManager.Instance.scoreHud = this;
+        levelManager = FindFirstObjectByType<LevelManager>();
+        levelManager.scoreHud = this;
     }
     public void UpdateScore(int score)
     {

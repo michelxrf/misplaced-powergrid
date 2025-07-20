@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class TittleScreen : MonoBehaviour
 {
@@ -15,7 +14,9 @@ public class TittleScreen : MonoBehaviour
     private void Start()
     {
         noMusic.SetActive(GameManager.Instance.IsBgmMuted());
-        noSound.SetActive(false);
+        noSound.SetActive(AudioListener.volume == 0f);
+
+        PreviousLevel();
     }
     public void NextLevel()
     {

@@ -1,10 +1,6 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine.SceneManagement;
-using UnityEngine.Audio;
 
 
 /// <summary>
@@ -12,35 +8,24 @@ using UnityEngine.Audio;
 /// </summary>
 public class LevelManager : MonoBehaviour
 {
-    public static LevelManager Instance;
-
     public ScoreHud scoreHud;
 
     public GameObject gameEndScreen;
     public GameObject pauseScreen;
     public GameObject gridBox;
     public GameObject scoreScreen;
+    public AudioSource winSfx;
 
     public List<PowerNode> powerNodes;
     public List<PowerNode> powerSources;
     public List<PowerNode> towns;
 
     public int setPieces = 0;
+    public int level = 0;
 
     [HideInInspector] public bool isPaused = false;
     [HideInInspector] public bool isGameover = false;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
-    }
+    [HideInInspector] public bool isDragging = false;
 
     /// <summary>
     /// Counts the score and updates it's visual
@@ -85,6 +70,13 @@ public class LevelManager : MonoBehaviour
     void EndGame()
     {
         isGameover = true;
+
+        winSfx.Play();
+
+        GameManager.Instance.RegisterScore(level, setPieces);
+        
+        Hud hud = FindFirstObjectByType<Hud>();
+        hud.Score(setPieces);
 
         gridBox.gameObject.SetActive(false);
         scoreScreen.gameObject.SetActive(false);
@@ -163,8 +155,7 @@ public class LevelManager : MonoBehaviour
 
     public void Quit()
     {
-        SceneManager.LoadScene(1);
-        Destroy(gameObject);
+        SceneManager.LoadScene(0);
     }
 
     public void NextLevel()

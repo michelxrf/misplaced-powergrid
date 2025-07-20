@@ -10,6 +10,7 @@ public class Hud : MonoBehaviour
     [SerializeField] GameObject pauseScreen;
 
     [SerializeField] TextMeshProUGUI finalScore;
+    private LevelManager levelManager;
 
     private void Start()
     {
@@ -18,15 +19,17 @@ public class Hud : MonoBehaviour
         pauseScreen.SetActive(false);
         gameEndScreen.SetActive(false);
 
-        LevelManager.Instance.gameEndScreen = gameEndScreen;
-        LevelManager.Instance.pauseScreen = pauseScreen;
-        LevelManager.Instance.scoreScreen = scoreBox;
-        LevelManager.Instance.gridBox = gridBox;
+        levelManager = FindFirstObjectByType<LevelManager>();
+
+        levelManager.gameEndScreen = gameEndScreen;
+        levelManager.pauseScreen = pauseScreen;
+        levelManager.scoreScreen = scoreBox;
+        levelManager.gridBox = gridBox;
     }
 
     public void Unpause()
     {
-        LevelManager.Instance.Pause(false);
+        levelManager.Pause(false);
     }
 
     public void Restart()
@@ -37,11 +40,16 @@ public class Hud : MonoBehaviour
     public void Quit()
     {
 
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(0);
     }
 
     public void Score(int score)
     {
         finalScore.text = score.ToString();
+    }
+
+    public void Nextlevel()
+    {
+        levelManager.NextLevel();
     }
 }

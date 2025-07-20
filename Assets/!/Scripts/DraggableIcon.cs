@@ -15,11 +15,13 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     [SerializeField] GameObject outOfPiecesIcon;
     [SerializeField] Texture2D dragCursor;
 
-    [SerializeField] AudioSource placeSound;
+    [SerializeField] AudioSource buildSound;
+    [SerializeField] AudioSource cancelSound;
 
     BlankTile currentlySelectedTile;
     private Outline outline;
     bool locked = false;
+    private LevelManager levelManager;
 
     private void Awake()
     {
@@ -45,6 +47,11 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         }
     }
 
+    private void Start()
+    {
+        levelManager = FindFirstObjectByType<LevelManager>();
+    }
+
     /// <summary>
     /// Shows the the selected piece as the player drags a new piece to the board.
     /// </summary>
@@ -53,6 +60,8 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         if (locked)
             return;
+
+        levelManager.isDragging = true;
 
         Cursor.SetCursor(dragCursor, new Vector2(0,0), CursorMode.Auto);
 
@@ -87,9 +96,18 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
                     tile.EnablePreview();
                 }
             }
+            else
+            {
+                if (currentlySelectedTile != null)
+                {
+                    currentlySelectedTile.DisablePreview();
+                    currentlySelectedTile = null;
+                }
+            }
         }
         else
         {
+            Debug.Log("Beep");
             if (currentlySelectedTile != null)
             {
                 currentlySelectedTile.DisablePreview();
@@ -106,6 +124,8 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         if(locked)
             return;
+
+        levelManager.isDragging= false;
 
         Cursor.SetCursor(null, new Vector2(0, 0), CursorMode.Auto);
 
@@ -134,11 +154,21 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
                     LockPiece();
                     
             }
+            else
+            {
+                cancelSound.Play();
+                if (currentlySelectedTile != null)
+                {
+                    currentlySelectedTile.DisablePreview();
+                    currentlySelectedTile = null;
+                }
+            }
         }
         else
         {
             if (currentlySelectedTile != null)
             {
+                cancelSound.Play();
                 currentlySelectedTile.DisablePreview();
                 currentlySelectedTile = null;
             }
@@ -157,9 +187,9 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     private void SetTile(GameObject blankTile)
     {
-        placeSound.Play();
+        buildSound.Play();
         GameObject newTile = Instantiate(gridPrefab, blankTile.transform.position, Quaternion.identity, blankTile.transform.parent);
-        LevelManager.Instance.CountPiece();
+        levelManager.CountPiece();
         Destroy(blankTile);
     }
 }

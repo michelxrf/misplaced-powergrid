@@ -13,6 +13,8 @@ public class PowerNode : MonoBehaviour
     [SerializeField] GameObject poweredLight;
     [SerializeField] Image poweredIcon;
 
+    private LevelManager levelManager;
+
     private void Awake()
     {
         TogglePower(isPowerSource);
@@ -20,7 +22,8 @@ public class PowerNode : MonoBehaviour
 
     private void Start()
     {
-        LevelManager.Instance.RegisterPiece(this);
+        levelManager = FindFirstObjectByType<LevelManager>();
+        levelManager.RegisterPiece(this);
     }
 
     public void ConnectAllNeighbors()

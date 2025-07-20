@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -5,16 +6,20 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     [SerializeField] AudioSource bgm;
 
+    Dictionary<int, int> scores = new Dictionary<int, int>();
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
         else
         {
             Instance = this;
         }
+
+        DontDestroyOnLoad(gameObject);
     }
 
     public void ToggleBGM()
@@ -25,5 +30,10 @@ public class GameManager : MonoBehaviour
     public bool IsBgmMuted()
     {
         return bgm.mute;
+    }
+
+    public void RegisterScore(int level, int score)
+    {
+        scores[level] = score;
     }
 }

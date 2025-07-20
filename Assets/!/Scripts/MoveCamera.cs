@@ -11,15 +11,22 @@ public class MoveCamera : MonoBehaviour
     private float yaw = 0f;
     private float pitch = 0f;
 
+    private LevelManager levelManager;
+
     void Start()
     {
+        levelManager = FindFirstObjectByType<LevelManager>();
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
     void Update()
     {
-        if (LevelManager.Instance.isPaused || LevelManager.Instance.isGameover)
+        if (levelManager != null)
+            levelManager = FindFirstObjectByType<LevelManager>();
+
+        if (levelManager.isPaused || levelManager.isGameover)
             return;
 
         HandleMouseLook();
@@ -54,6 +61,9 @@ public class MoveCamera : MonoBehaviour
         float moveX = Input.GetAxis("Horizontal"); // A/D
         float moveZ = Input.GetAxis("Vertical");   // W/S
         float moveY = 0f;
+
+        if (Input.GetKey(KeyCode.Space)) moveY += 1f;         // Up
+        if (Input.GetKey(KeyCode.LeftControl)) moveY -= 1f;   // Down
 
         Vector3 move = transform.right * moveX + transform.up * moveY + transform.forward * moveZ;
         transform.position += move * moveSpeed * Time.deltaTime;
