@@ -1,10 +1,182 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
+using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.SceneManagement;
 
 
 /// <summary>
-/// Keeps track of the level state like score, game state and win conditions.
+/// Singleton to keep track of the level state like score, game state and win conditions.
 /// </summary>
 public class LevelManager : MonoBehaviour
 {
+    public static LevelManager Instance;
+
+    public ScoreHud scoreHud;
+
+    public GameObject gameEndScreen;
+    public GameObject pauseScreen;
+    public GameObject gridBox;
+    public GameObject scoreScreen;
+
+    public List<PowerNode> powerNodes;
+    public List<PowerNode> powerSources;
+    public List<PowerNode> towns;
+
+    public int setPieces = 0;
+
+    [HideInInspector] public bool isPaused = false;
+    [HideInInspector] public bool isGameover = false;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
+
+    private void Start()
+    {
+        gridBox.SetActive(true);
+        scoreScreen.SetActive(true);
+        pauseScreen.SetActive(false);
+        gameEndScreen.SetActive(false);
+    }
+
+    /// <summary>
+    /// Counts the score and updates it's visual
+    /// </summary>
+    public void CountPiece()
+    {
+        setPieces++;
+        scoreHud.UpdateScore(setPieces);
+    }
+
+    public void SpreadEnergy()
+    {
+        foreach(PowerNode town in towns)
+        {
+            town.Disconnect();
+            town.ConnectAllNeighbors();
+        }
+
+        foreach(PowerNode node in powerNodes)
+        {
+            node.Disconnect();
+            node.ConnectAllNeighbors();
+        }
+
+        foreach (PowerNode powerSource in powerSources)
+        {
+            powerSource.Disconnect();
+            powerSource.ConnectAllNeighbors();
+        }
+
+        foreach (PowerNode powerSource in powerSources)
+        {
+            FloodEnergy(powerSource);
+        }
+
+        if(AllTownsPowered())
+        {
+            EndGame();
+        }
+    }
     
+    void EndGame()
+    {
+        isGameover = true;
+
+        gridBox.gameObject.SetActive(false);
+        scoreScreen.gameObject.SetActive(false);
+        gameEndScreen.gameObject.SetActive(true);
+    }
+
+    private void Update()
+    {
+        if (isGameover)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Pause(!isPaused);
+        }
+    }
+
+    bool AllTownsPowered()
+    {
+        if(towns.Count == 0)
+            return false;
+
+        int townCount = 0;
+
+        foreach (PowerNode town in towns)
+        {
+            townCount += town.isPowered ? 1 : 0;
+        }
+
+        return townCount == towns.Count;
+    }
+
+    public void FloodEnergy(PowerNode node, HashSet<PowerNode> visited = null)
+    {
+        if (visited == null)
+            visited = new HashSet<PowerNode>();
+
+        if (node == null || visited.Contains(node))
+            return;
+
+        Debug.Log("Flood");
+        visited.Add(node);
+        node.TogglePower(true);
+
+        foreach (PowerNode neighbor in node.connectedNodes)
+        {
+            FloodEnergy(neighbor, visited);
+        }
+    }
+
+    public void RegisterPiece(PowerNode newPiece)
+    {
+        if (newPiece.isTown)
+        {
+            towns.Add(newPiece);
+        }
+        else if (newPiece.isPowerSource)
+        {
+            powerSources.Add(newPiece);
+        }
+        else
+            powerNodes.Add(newPiece);
+
+        SpreadEnergy();
+    }
+
+    public void Pause(bool newState)
+    {
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+
+        scoreScreen.SetActive(!newState);
+        gridBox.SetActive(!newState);
+        pauseScreen.SetActive(newState);
+
+        isPaused = newState;
+    }
+
+    public void Quit()
+    {
+        SceneManager.LoadScene(1);
+        Destroy(gameObject);
+    }
+
+    public void NextLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
 }
