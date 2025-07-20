@@ -15,6 +15,8 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     [SerializeField] GameObject outOfPiecesIcon;
     [SerializeField] Texture2D dragCursor;
 
+    [SerializeField] AudioSource placeSound;
+
     BlankTile currentlySelectedTile;
     private Outline outline;
     bool locked = false;
@@ -30,6 +32,16 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         {
             outOfPiecesIcon.SetActive(false);
             amountText.gameObject.SetActive(false);
+        }
+        else if(amount == 0)
+        {
+            LockPiece();
+        }
+        else
+        {
+            outOfPiecesIcon.SetActive(false);
+            amountText.gameObject.SetActive(true);
+            amountText.text = amount.ToString();
         }
     }
 
@@ -140,11 +152,12 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         locked = true;
         outOfPiecesIcon.SetActive(true);
-        amountText.text = "";
+        amountText.gameObject.SetActive(false);
     }
 
     private void SetTile(GameObject blankTile)
     {
+        placeSound.Play();
         GameObject newTile = Instantiate(gridPrefab, blankTile.transform.position, Quaternion.identity, blankTile.transform.parent);
         LevelManager.Instance.CountPiece();
         Destroy(blankTile);

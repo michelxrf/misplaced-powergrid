@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
 
 
 /// <summary>
@@ -39,14 +40,6 @@ public class LevelManager : MonoBehaviour
         {
             Instance = this;
         }
-    }
-
-    private void Start()
-    {
-        gridBox.SetActive(true);
-        scoreScreen.SetActive(true);
-        pauseScreen.SetActive(false);
-        gameEndScreen.SetActive(false);
     }
 
     /// <summary>
@@ -132,7 +125,6 @@ public class LevelManager : MonoBehaviour
         if (node == null || visited.Contains(node))
             return;
 
-        Debug.Log("Flood");
         visited.Add(node);
         node.TogglePower(true);
 
