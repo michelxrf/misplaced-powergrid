@@ -144,8 +144,6 @@ public class LevelManager : MonoBehaviour
 
     public void Pause(bool newState)
     {
-        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-
         scoreScreen.SetActive(!newState);
         gridBox.SetActive(!newState);
         pauseScreen.SetActive(newState);

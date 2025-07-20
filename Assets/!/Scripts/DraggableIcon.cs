@@ -13,7 +13,6 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     [SerializeField] int amount = -1;
     [SerializeField] TextMeshProUGUI amountText;
     [SerializeField] GameObject outOfPiecesIcon;
-    [SerializeField] Texture2D dragCursor;
 
     [SerializeField] AudioSource buildSound;
     [SerializeField] AudioSource cancelSound;
@@ -63,8 +62,6 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
         levelManager.isDragging = true;
 
-        Cursor.SetCursor(dragCursor, new Vector2(0,0), CursorMode.Auto);
-
         outline.enabled = true;
     }
 
@@ -107,7 +104,6 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         }
         else
         {
-            Debug.Log("Beep");
             if (currentlySelectedTile != null)
             {
                 currentlySelectedTile.DisablePreview();
@@ -126,8 +122,6 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             return;
 
         levelManager.isDragging= false;
-
-        Cursor.SetCursor(null, new Vector2(0, 0), CursorMode.Auto);
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
