@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 /// <summary>
-/// Shows score on hud
+/// Shows score on screen.
 /// </summary>
 public class ScoreHud : MonoBehaviour
 {

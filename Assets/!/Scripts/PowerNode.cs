@@ -2,6 +2,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+
+/// <summary>
+/// Controls the behavior of a piece of the power grid
+/// </summary>
 public class PowerNode : MonoBehaviour
 {
     public bool isPowered = false;
@@ -23,9 +27,13 @@ public class PowerNode : MonoBehaviour
     private void Start()
     {
         levelManager = FindFirstObjectByType<LevelManager>();
+        // calls the level manager to register itself on the list of pieces
         levelManager.RegisterPiece(this);
     }
 
+    /// <summary>
+    /// Goes through every conection point to verify if another piece is on it's side
+    /// </summary>
     public void ConnectAllNeighbors()
     {
         foreach(var conectionPoint  in conectionPoints)
@@ -38,6 +46,7 @@ public class PowerNode : MonoBehaviour
                 {
                     if (hit.gameObject.TryGetComponent<PowerNode>(out PowerNode hitNode))
                     {
+                        // tries to connect with the found neihgboring piece
                         hitNode.Handshake(this);
                     }
                 }
@@ -45,6 +54,10 @@ public class PowerNode : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Called by another piece to attempt to connect. It will connect if both are mutual neigbors.
+    /// </summary>
+    /// <param name="otherNode">The piece that called to attempt a connection.</param>
     private void Handshake(PowerNode otherNode)
     {
         foreach (var conectionPoint in conectionPoints)
@@ -55,6 +68,7 @@ public class PowerNode : MonoBehaviour
             {
                 if (hit.gameObject.GetComponent<PowerNode>() == otherNode)
                 {
+                    // Connect both
                     otherNode.ConnectNode(this);
                     ConnectNode(otherNode);
                 }
@@ -62,18 +76,29 @@ public class PowerNode : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Adds the node to the list of connected nodes
+    /// </summary>
+    /// <param name="otherNode">The node it connects to.</param>
     void ConnectNode(PowerNode otherNode)
     {
         if (!connectedNodes.Contains(otherNode))
             connectedNodes.Add(otherNode);
     }
 
+    /// <summary>
+    /// Remove the node from it's list of connection and turns off if not a power plant.
+    /// </summary>
     public void Disconnect()
     {
         TogglePower(isPowerSource);
         connectedNodes.Clear();
     }
 
+    /// <summary>
+    /// Changes it's powered state and toogles visual effects.
+    /// </summary>
+    /// <param name="newState"></param>
     public void TogglePower(bool newState)
     {
         isPowered = newState;

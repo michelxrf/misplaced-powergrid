@@ -4,12 +4,14 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// Controls what happens when player drags a piece from the pieces box in the hud.
-/// Most of the time this means the player is setting this piece in the board.
+/// Controls what happens when player drags a piece from the pieces box in the hud to the game world.
 /// </summary>
 public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    // the piece
     [SerializeField] GameObject gridPrefab;
+    
+    // used to limit pieces per level, -1 means unlimited
     [SerializeField] int amount = -1;
     [SerializeField] TextMeshProUGUI amountText;
     [SerializeField] GameObject outOfPiecesIcon;
@@ -18,8 +20,10 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     [SerializeField] AudioSource cancelSound;
 
     BlankTile currentlySelectedTile;
+
     private Outline outline;
     bool locked = false;
+
     private LevelManager levelManager;
 
     private void Awake()
@@ -29,6 +33,7 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
         amountText.text = amount.ToString();
 
+        // init the icon according to it's inital condition set for the level
         if (amount == -1)
         {
             outOfPiecesIcon.SetActive(false);
@@ -82,19 +87,24 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             BlankTile tile = hit.transform.GetComponent<BlankTile>();
             if (tile != null)
             {
+                // player's pointing at a new blank tile
                 if (tile != currentlySelectedTile)
                 {
                     if (currentlySelectedTile != null)
                     {
+                        // disables preview on the previous tile
                         currentlySelectedTile.DisablePreview();
                     }
 
+                    // enables preview in the new blank tile
                     currentlySelectedTile = tile;
                     tile.EnablePreview();
                 }
             }
+            // player's pointing at a tile that's not a blank
             else
             {
+                // will remove the preview
                 if (currentlySelectedTile != null)
                 {
                     currentlySelectedTile.DisablePreview();
@@ -102,8 +112,11 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
                 }
             }
         }
+        // Player's pointing at something, but it's not a tile
+        // DISCLAIMER: would be more efficient to filter the Raycast with layers. Pressed for time I made this less than ideal solution.
         else
         {
+            // disables the preview
             if (currentlySelectedTile != null)
             {
                 currentlySelectedTile.DisablePreview();
@@ -131,6 +144,7 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             BlankTile tile = hit.transform.GetComponent<BlankTile>();
             if (tile != null)
             {
+                // player dropped the piece in a valid position
                 if (tile != currentlySelectedTile)
                 {
                     if (currentlySelectedTile != null)
@@ -148,6 +162,7 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
                     LockPiece();
                     
             }
+            // player dropped it in a not valid tile, cancels the piece setting
             else
             {
                 cancelSound.Play();
@@ -158,6 +173,8 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
                 }
             }
         }
+        // player dropped somewhere that's not a tile
+        // DISCLAIMER: would be more efficient to filter the Raycast with layers. Pressed for time I made this less than ideal solution.
         else
         {
             if (currentlySelectedTile != null)
@@ -172,6 +189,9 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         outline.enabled = false;
     }
 
+    /// <summary>
+    /// Shows the piece as unavailable in the hud and prevents its use
+    /// </summary>
     void LockPiece()
     {
         locked = true;
@@ -179,6 +199,10 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         amountText.gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// Places a new piece in the game world.
+    /// </summary>
+    /// <param name="blankTile">The blank tile that will be replaced by the new piece.</param>
     private void SetTile(GameObject blankTile)
     {
         buildSound.Play();

@@ -2,6 +2,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Controls the in game menus, like pause pause menu, game end screen and updates the score on the hud.
+/// </summary>
 public class Hud : MonoBehaviour
 {
     [SerializeField] GameObject gameEndScreen;

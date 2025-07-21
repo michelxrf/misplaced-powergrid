@@ -1,6 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+/// Singleton to keep bgm track position between levels so it won't restart at every load.
+/// Also meant to keep player's overall score, but I had to cut the leaderboard to save time.
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;

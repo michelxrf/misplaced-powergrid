@@ -2,7 +2,7 @@ using UnityEngine;
 
 
 /// <summary>
-/// Rotates the icons on top of pieces to look to the camera.
+/// Rotates the icons on top of objectives so they always face the camera.
 /// </summary>
 public class IconLookAtCamera : MonoBehaviour
 {

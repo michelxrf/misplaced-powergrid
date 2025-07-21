@@ -24,7 +24,8 @@ public class RotateOnClick : MonoBehaviour
                 if (hit.transform == transform)
                 {
                     transform.Rotate(0f, 90f, 0);
-                    levelManager.SpreadEnergy();
+                    // Tells the game to refresh all connections
+                    levelManager.UpdateConnections();
                 }
             }
         }

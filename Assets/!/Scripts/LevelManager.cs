@@ -28,7 +28,7 @@ public class LevelManager : MonoBehaviour
     [HideInInspector] public bool isDragging = false;
 
     /// <summary>
-    /// Counts the score and updates it's visual
+    /// Counts the score and call hud to update it's visual
     /// </summary>
     public void CountPiece()
     {
@@ -36,8 +36,13 @@ public class LevelManager : MonoBehaviour
         scoreHud.UpdateScore(setPieces);
     }
 
-    public void SpreadEnergy()
+    /// <summary>
+    /// Rechecks every powernode connection and then tries to spread the power from the power plants throughout the grid recursively.
+    /// Called every time the player set a new piece or rotates an existing one.
+    /// </summary>
+    public void UpdateConnections()
     {
+        // updates all conections ---
         foreach(PowerNode town in towns)
         {
             town.Disconnect();
@@ -55,18 +60,24 @@ public class LevelManager : MonoBehaviour
             powerSource.Disconnect();
             powerSource.ConnectAllNeighbors();
         }
+        // ---
 
+        // recursively tries to spread energy from every powerstation
         foreach (PowerNode powerSource in powerSources)
         {
             FloodEnergy(powerSource);
         }
 
+        // if all towns are powered ends the level
         if(AllTownsPowered())
         {
             EndGame();
         }
     }
     
+    /// <summary>
+    /// Called when all towns are powered to show the game end screen.
+    /// </summary>
     void EndGame()
     {
         isGameover = true;
@@ -88,27 +99,40 @@ public class LevelManager : MonoBehaviour
         if (isGameover)
             return;
 
+        // pauses the game on ESC pressed
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Pause(!isPaused);
         }
     }
 
+    /// <summary>
+    /// Verifies if all towns have power, whinch is the game end condition.
+    /// </summary>
+    /// <returns>True when all towns have power, False otherwise.</returns>
     bool AllTownsPowered()
     {
         if(towns.Count == 0)
+        {
+            Debug.LogError("No towns in this level!");
             return false;
+        }
 
-        int townCount = 0;
+        int poweredTownCount = 0;
 
         foreach (PowerNode town in towns)
         {
-            townCount += town.isPowered ? 1 : 0;
+            poweredTownCount += town.isPowered ? 1 : 0;
         }
 
-        return townCount == towns.Count;
+        return poweredTownCount == towns.Count;
     }
 
+    /// <summary>
+    /// Recursively walks all pieces connected, powering everything.
+    /// </summary>
+    /// <param name="node">The starting node.</param>
+    /// <param name="visited">Hash passed down to prevent infinite loops.</param>
     public void FloodEnergy(PowerNode node, HashSet<PowerNode> visited = null)
     {
         if (visited == null)
@@ -117,15 +141,20 @@ public class LevelManager : MonoBehaviour
         if (node == null || visited.Contains(node))
             return;
 
-        visited.Add(node);
         node.TogglePower(true);
+        visited.Add(node);
 
+        // Recursively calls every piece connceted to this node
         foreach (PowerNode neighbor in node.connectedNodes)
         {
             FloodEnergy(neighbor, visited);
         }
     }
 
+    /// <summary>
+    /// Registers a new piece to level's list. Called by the pieces themselves, either on level init or when player sets a new one.
+    /// </summary>
+    /// <param name="newPiece">Reference to the new piece.</param>
     public void RegisterPiece(PowerNode newPiece)
     {
         if (newPiece.isTown)
@@ -139,9 +168,13 @@ public class LevelManager : MonoBehaviour
         else
             powerNodes.Add(newPiece);
 
-        SpreadEnergy();
+        UpdateConnections();
     }
 
+    /// <summary>
+    /// Shows the pause menu and reduces player agency.
+    /// </summary>
+    /// <param name="newState">On or Off</param>
     public void Pause(bool newState)
     {
         scoreScreen.SetActive(!newState);
@@ -151,11 +184,17 @@ public class LevelManager : MonoBehaviour
         isPaused = newState;
     }
 
+    /// <summary>
+    /// Loads the tittle screen
+    /// </summary>
     public void Quit()
     {
         SceneManager.LoadScene(0);
     }
 
+    /// <summary>
+    /// Loads the next level. Called by the game end screen.
+    /// </summary>
     public void NextLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);

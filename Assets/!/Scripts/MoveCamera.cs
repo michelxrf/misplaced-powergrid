@@ -1,7 +1,11 @@
 using UnityEngine;
 
+/// <summary>
+/// Controls player camera movement, basically a floating FPS camera.
+/// </summary>
 public class MoveCamera : MonoBehaviour
 {
+
     public float moveSpeed = 10f;
     public float lookSpeed = 2f;
 
@@ -26,6 +30,7 @@ public class MoveCamera : MonoBehaviour
         if (levelManager != null)
             levelManager = FindFirstObjectByType<LevelManager>();
 
+        // prevents movement when game is paused or on game end screen
         if (levelManager.isPaused || levelManager.isGameover)
             return;
 
@@ -33,6 +38,9 @@ public class MoveCamera : MonoBehaviour
         HandleMovement();
     }
 
+    /// <summary>
+    /// Handles camera rotation while right mouse is pressed
+    /// </summary>
     void HandleMouseLook()
     {
         if (Input.GetMouseButton(1)) // Right mouse button
@@ -56,6 +64,9 @@ public class MoveCamera : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles keyboard camera movement
+    /// </summary>
     void HandleMovement()
     {
         float moveX = Input.GetAxis("Horizontal"); // A/D
@@ -71,6 +82,9 @@ public class MoveCamera : MonoBehaviour
         ClampMovement();
     }
 
+    /// <summary>
+    /// Limits the movement to prevent player from leaving game level boundaries. Movement is limited by manually setting two corners of a bounding box.
+    /// </summary>
     void ClampMovement()
     {
         float clampedx = Mathf.Clamp(transform.position.x, Mathf.Min(upperLimit.transform.position.x, lowerLimit.transform.position.x), Mathf.Max(upperLimit.transform.position.x, lowerLimit.transform.position.x));

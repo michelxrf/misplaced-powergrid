@@ -1,6 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
+
+/// <summary>
+/// A scripted animation of the splash screen on the game start.
+/// </summary>
 public class SplashScreenController : MonoBehaviour
 {
     public CanvasGroup logo1;
