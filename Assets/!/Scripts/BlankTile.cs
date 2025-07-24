@@ -6,25 +6,20 @@ using UnityEngine;
 /// </summary>
 public class BlankTile : MonoBehaviour
 {
-    MeshFilter meshFilter;
-
-    Mesh originalMesh;
-    [SerializeField] Mesh previewMesh;
-
+    [SerializeField] GameObject preview;
 
     private void Awake()
     {
-        meshFilter = GetComponent<MeshFilter>();
-        originalMesh = meshFilter.mesh;
+        preview.SetActive(false);
     }
 
     public void EnablePreview()
     {
-        meshFilter.mesh = previewMesh;
+        preview.SetActive(true);
     }
 
     public void DisablePreview()
     {
-        meshFilter.mesh = originalMesh;
+        preview.SetActive(false);
     }
 }

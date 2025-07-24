@@ -79,6 +79,17 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         if (locked)
             return;
 
+        // cancels tile preview if dragging over UI
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            if (currentlySelectedTile != null)
+            {
+                currentlySelectedTile.DisablePreview();
+                currentlySelectedTile = null;
+            }
+            return;
+        }
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
@@ -133,6 +144,20 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         if(locked)
             return;
+
+        // cancels tile setting if dropping over UI
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            cancelSound.Play();
+            outline.enabled = false;
+
+            if (currentlySelectedTile != null)
+            {
+                currentlySelectedTile.DisablePreview();
+                currentlySelectedTile = null;
+            }
+            return;
+        }
 
         levelManager.isDragging= false;
 

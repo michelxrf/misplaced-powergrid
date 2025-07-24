@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(BoxCollider))]
 /// <summary>
 /// Controls the behavior of a piece of the power grid
 /// </summary>
@@ -12,7 +13,7 @@ public class PowerNode : MonoBehaviour
     public bool isPowerSource = false;
     public bool isTown = false;
 
-    public List<PowerNode> connectedNodes = new List<PowerNode>();
+    [HideInInspector] public List<PowerNode> connectedNodes = new List<PowerNode>();
     [SerializeField] List<GameObject> conectionPoints = new List<GameObject>();
     [SerializeField] GameObject poweredLight;
     [SerializeField] Image poweredIcon;

@@ -114,7 +114,6 @@ public class LevelManager : MonoBehaviour
     {
         if(towns.Count == 0)
         {
-            Debug.LogError("No towns in this level!");
             return false;
         }
 

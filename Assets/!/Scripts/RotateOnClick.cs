@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Rotates 90 deg on Y once object gets clicked, used to rotate powergrid pieces
@@ -18,6 +19,10 @@ public class RotateOnClick : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            // prevents rotation when clicking through the UI, it happened if theres a piece under the tile box ui
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {

@@ -1,5 +1,7 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 
 /// <summary>
@@ -11,8 +13,12 @@ public class SplashScreenController : MonoBehaviour
     public CanvasGroup logo2;
     public CanvasGroup mainMenu;
 
+    public float initialWait = .5f;
     public float fadeDuration = 1f;
     public float logoDisplayTime = 1f;
+
+    public bool allowSkipping = false;
+    bool isSplashing = true;
 
     private void Awake()
     {
@@ -27,13 +33,40 @@ public class SplashScreenController : MonoBehaviour
         StartCoroutine(PlaySplashSequence());
     }
 
+    private void Update()
+    {
+        SkipIntro();
+    }
+
+    /// <summary>
+    /// Allows the player to skip the splash screen
+    /// </summary>
+    void SkipIntro()
+    {
+        if (!isSplashing || !allowSkipping)
+            return;
+
+        // allows for splash screen skip
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Return))
+        {
+            isSplashing = false;
+            StopAllCoroutines();
+
+            logo1.alpha = 0;
+            logo2.alpha = 0;
+            mainMenu.alpha = 1;
+            mainMenu.interactable = true;
+        }
+    }
+
     IEnumerator PlaySplashSequence()
     {
-        yield return new WaitForSeconds(logoDisplayTime);
+        yield return new WaitForSeconds(initialWait);
         yield return StartCoroutine(FadeInOut(logo1));
         yield return StartCoroutine(FadeInOut(logo2));
         yield return StartCoroutine(FadeIn(mainMenu));
         mainMenu.interactable = true;
+        isSplashing = false;
     }
 
     IEnumerator FadeInOut(CanvasGroup canvas)
